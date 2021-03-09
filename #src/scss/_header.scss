@@ -1,0 +1,72 @@
+// Header спрятан на main, фиксировано позиционирован на остальных страницах
+
+.header {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	padding: 0.5rem;
+	@extend %gradient-bg;
+	backdrop-filter: blur(2px);
+
+	.nav {
+		display: flex;
+		justify-content: space-between;
+
+		&__list {
+		display: flex;
+		justify-content: flex-start;
+		}
+
+		&__item {
+		margin-right: 0.5rem;
+		list-style: none;
+		}
+
+		&__link {
+		display: flex;
+		align-items: center;
+		padding: 5px;
+		text-decoration: none;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		transform-style: preserve-3d
+		}
+
+		&__icon {
+		position: relative;
+		left: 50%;
+		flex-shrink: 0;
+		width: 2rem;
+		margin-right: 5px;
+		transform: translateX(-50%);
+		transition: left 0.2s, transform 0.2s;
+		}
+
+		&__text {
+		text-align: center;
+		line-height: 0.8rem;
+		color: $col-text-dark;
+		@extend %font-bold;
+		opacity: 0;
+		transform: translateX(-50%) scale(0.5);
+		transition: opacity 0.2s, transform 0.2s;
+		}
+	}
+}
+
+
+// ! Hovers
+.nav__link:hover {
+
+	.nav__icon {
+		left: 0;
+		transform: translateX(0) translateZ(1rem);
+	}
+
+	.nav__text {
+		opacity: 1;
+		transform: translateX(0) scale(1) translateZ(1rem);
+	}
+}

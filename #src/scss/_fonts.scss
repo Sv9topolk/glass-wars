@@ -1,0 +1,20 @@
+
+@font-face {
+	font-family: "Piazzolla";
+	src: local("Piazzolla"),
+		url("../fonts/Piazzolla-Regular.woff2") format("woff2"),
+		url("../fonts/Piazzolla-Regular.woff") format("woff");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Piazzolla";
+	src: local("Piazzolla"),
+		url("../fonts/Piazzolla-Bold.woff2") format("woff2"),
+		url("../fonts/Piazzolla-Bold.woff") format("woff");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}

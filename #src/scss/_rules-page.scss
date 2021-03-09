@@ -1,0 +1,80 @@
+
+.rules {
+	position: relative;
+	width: 100%;
+	padding: 2rem 1rem 0;
+
+	&__navigate {
+		position: relative;
+	}
+
+	&__info {
+		position: relative;
+		z-index: 10;
+		width: 100%;
+		height: 60vh;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		backdrop-filter: blur(2px);
+	}
+}
+
+.rules-nav {
+	display: flex;
+	justify-content: space-between;
+
+	&__item {
+		position: relative;
+		top: 1.5rem;
+		display: flex;
+		align-items: center;
+		height: 3rem;
+		padding: 0.5rem;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		backdrop-filter: blur(2px);
+		cursor: pointer;
+		overflow: hidden;
+		user-select: none;
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: -4rem;
+			// right: auto;
+			bottom: 0;
+			display: block;
+			width: 3rem;
+			background-color: $col-glass-08;
+			transform: skewX(45deg);
+			transition: left 0.2s;
+		}
+
+		&:hover::before {
+			left: calc(100% + 1rem);
+		}
+
+		&.active {
+			z-index: 12;
+		}
+	}
+
+	&__icon {
+		width: 2rem;
+		height: 2rem;
+		margin-right: 0.5rem;
+	}
+
+	&__text {
+		display: block;
+		height: 2rem;
+		color: $col-text-dark;
+		line-height: 1.6rem;
+		font-size: 1.5rem;
+	}
+}
+
+.rules-info {
+	padding: 2rem 0.5rem 0.5rem;
+}

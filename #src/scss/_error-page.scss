@@ -1,0 +1,56 @@
+
+.error {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: calc(100vh - 3.5rem);
+	padding-bottom: 3.5rem;
+	
+	&__err {
+		height: 5rem;
+		line-height: 5rem;
+		padding: 0 2rem;
+		text-align: center;
+		font-size: 4rem;
+		color: white;
+		@extend %font-bold;
+		@extend %text-3d;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		backdrop-filter: blur(2px);
+	}
+
+	&__404 {
+		position: relative;
+		top: -2rem;
+		height: 6rem;
+		line-height: 6rem;
+		padding: 0 2rem;
+		text-align: center;
+		font-size: 5rem;
+		@extend %font-bold;
+		@extend %text-3d;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		backdrop-filter: blur(2px);
+	}
+
+	&__message {
+		margin-bottom: 2rem;
+		font-size: 2rem;
+		font-weight: 400;
+		color: $col-glass-08;
+		text-align: center;
+	}
+
+	&__return {
+		font-size: 1.5rem;
+		font-weight: 400;
+		color: $col-text-dark;
+		text-align: center;
+		text-decoration: none;
+	}
+}

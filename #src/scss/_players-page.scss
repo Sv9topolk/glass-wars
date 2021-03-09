@@ -1,0 +1,65 @@
+
+.players {
+	position: relative;
+	margin: 2.5rem 1rem 0;
+	padding: 0 0.5rem 0.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	border-top: 1px solid $col-glass-05;
+	@extend %gradient-bg;
+	backdrop-filter: blur(2px);
+
+
+	&__title {
+		position:relative;
+		top: -1.5rem;
+		height: 3rem;
+		line-height: 2.5rem;
+		padding: 0 1rem;
+		font-size: 2rem;
+		font-weight: 700;
+		@extend %text-3d;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		backdrop-filter: blur(5px);
+	}
+
+	&__table {
+		width: 100%;
+		border-collapse: separate;
+	}
+}
+
+.stats {
+
+
+	th, td {
+		padding: 0.5rem;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		
+	}
+
+	&__heading {
+		height: 2rem;
+		font-size: 1.2rem;
+
+		th {
+			&:nth-child(1) {
+				width: 40%;
+			}
+			&:nth-child(2),
+			&:nth-child(3),
+			&:nth-child(4) {
+				width: 20%;
+			}
+		}
+		
+	}
+
+	// &__row {
+
+	// }
+}

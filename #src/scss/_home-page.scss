@@ -1,0 +1,393 @@
+// Название игры, главное меню, при клике появляется окно выбора варианта. Хедер скрыт
+
+.game-title {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-top: -3.5rem;
+	margin-bottom: -1.5rem;
+	user-select: none;
+
+	&__description {
+		margin: 0.5rem 0;
+		padding: 0.5rem;
+		font-size: 1.5rem;
+		@extend %font-regular;
+		color: $col-glass-08;
+	}
+
+	&__glass {
+		height: 5rem;
+		line-height: 5rem;
+		padding: 0 2rem;
+		text-align: center;
+		font-size: 4rem;
+		@extend %text-3d;
+		@extend %font-bold;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		backdrop-filter: blur(2px);
+	}
+
+	&__wars {
+		position: relative;
+		top: -2rem;
+		height: 6rem;
+		line-height: 6rem;
+		padding: 0 2rem;
+		text-align: center;
+		font-size: 5rem;
+		@extend %text-3d;
+		@extend %font-bold;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		backdrop-filter: blur(2px);
+	}
+}
+
+.menu {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	&__link {
+		position: relative;
+		display: flex;
+		align-items: center;
+		width: 20rem;
+		padding: 0.5rem;
+		margin: 1rem 0;
+		border-top: 1px solid $col-glass-05;
+		@extend %gradient-bg;
+		text-decoration: none;
+		cursor: pointer;
+		overflow: hidden;
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: -4rem;
+			// right: auto;
+			bottom: 0;
+			display: block;
+			width: 3rem;
+			background-color: $col-glass-08;
+			transform: skewX(45deg);
+			transition: left 0.2s;
+		}
+	
+		&:hover::before {
+			left: calc(100% + 1rem);
+		}
+	}
+
+	&__icon {
+		width: 2.5rem;
+		height: 2.5rem;
+		margin-right: 1.5rem;
+
+		// rect {fill: red;}
+		// path {fill: blue;}
+	}
+
+	&__text {
+		display: block;
+		height: 2.5rem;
+		line-height: 2rem;
+		font-size: 2rem;
+		color: white;
+	}
+}
+
+.music {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	display: block;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+
+	background-color: transparent;
+	border: none;
+	opacity: 0.5;
+	transition: opacity 0.2s, transform 0.2s;
+
+	&:hover {
+		opacity: 1;
+	}
+	&:focus {
+		outline: none;
+	}
+	&:active {
+		transform: scale(0.9);
+	}
+}
+
+// Блок аутентификации игроков
+.auth {
+	position: absolute;
+	top: 3.5rem;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 12;
+	transform: translateY(200%);
+
+	&__container {
+		position: relative;
+		width: 100%;
+		min-height: 100%;
+	}
+
+	&__player {
+		position: absolute;
+		top: 0;
+		width: 49%;
+		min-height: 100%;
+		padding: 1rem;
+		background-color: rgba(230, 245, 255, 0.7);
+		box-shadow: 0 1px 3px rgba(0, 70, 100, 1);
+		border-top: 1px solid $col-glass-08;
+		opacity: 0;
+		transition: transform 1s, opacity 1s;
+	
+		&--left {
+			left: 0;
+			transform: translateX(-100%);
+		}
+		&--right {
+			right: 0;
+			transform: translateX(100%);
+		}
+	}
+
+	&__btn {
+		visibility: hidden;
+		position: absolute;
+		display: block;
+		width: 6rem;
+		height: 2rem;
+		font-size: 1rem;
+		text-align: center;
+		@extend %font-bold;
+		color: $col-text-medium;
+		text-decoration: none;
+		background-color: rgba(100, 210, 255, 0.5);
+		box-shadow: 0 1px 3px rgba(0, 70, 100, 1);
+		border: none;
+		border-top: 1px solid $col-glass-05;
+		cursor: pointer;
+		opacity: 0;
+		transition: opacity 0.5s 1s, transform 0.2s;
+		
+		&--close {
+			top: 3px;
+			left: 50%;
+			transform: translateX(-50%);
+			&:active {
+				outline: none;
+				transform: translateX(-50%) scale(0.9);
+			}
+		}
+		&--start {
+			bottom: 3px;
+			right: 50%;
+			transform: translateX(50%);
+			&:active {
+				outline: none;
+				transform: translateX(50%) scale(0.9);
+			}
+		}
+
+		&:focus {
+			outline: none;
+		}
+		&:disabled {
+			opacity: 0.6 !important;
+		}
+	}
+
+	&__title {
+		margin-bottom: 1rem;
+		font-size: 2rem;
+		@extend %text-3d;
+		text-align: center;
+	}
+
+	&__form {
+		position: relative;
+	}
+
+	&__user {
+		position: relative;
+	}
+}
+.auth.show {
+	transform: translateY(0);
+	
+	.auth__player--left {
+		transform: translateX(0);
+		opacity: 1;
+	}
+
+	.auth__player--right {
+		transform: translateX(0);
+		opacity: 1;
+	}
+
+	.auth__btn {
+		visibility: visible;
+		opacity: 1;
+	}
+}
+
+// Форма аутентификации или регистрации игроков
+.form {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+
+	&__input {
+		height: 2.5rem;
+		line-height: 2.7rem;
+		margin-bottom: 1rem;
+		font-size: 1.5rem;
+		color: $col-text-dark;
+		text-align: center;
+		@extend %gradient-bg;
+		border: none;
+		border-top: 1px solid $col-glass-05;
+
+		&::placeholder {
+			font-size: 1.5rem;
+			
+			color: $col-text-light;
+		}
+		&:focus {
+			outline: none;
+			box-shadow: 0px 1px 5px rgba(0, 70, 100, 1);
+		}
+	}
+
+	&__btns {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: space-between;
+		margin-bottom: 1rem;
+	}
+
+	&__btn {
+		flex: 1 1 40%;
+		display: block;
+		height: 2.5rem;
+		font-size: 1rem;
+		text-align: center;
+		@extend %font-bold;
+		color: $col-text-medium;
+		text-decoration: none;
+		background-color: rgba(100, 210, 255, 0.5);
+		box-shadow: 0 1px 3px rgba(0, 70, 100, 1);
+		border: none;
+		border-top: 1px solid $col-glass-05;
+		cursor: pointer;
+		transition: opacity 0.5s 1s, transform 0.2s;
+
+		&--enter {
+			flex-basis: 100%;
+			margin-bottom: 0.5rem;
+		}
+		&:nth-child(2) {margin-right: 0.5rem;}
+
+		&:disabled {
+			opacity: 0.5;
+		}
+		&:focus {
+			outline: none;
+		}
+		&:active {
+			transform: scale(0.9);
+		}
+	}
+
+	&__error {
+		color: rgba(255, 0, 0, 1);
+	}
+}
+
+// Игрок выбран, выбор фракции и начало игры
+.user {
+
+	&__name {
+		font-size: 3rem;
+		font-weight: 700;
+		text-align: center;
+		margin-bottom: 1rem;
+	}
+
+	&__input-name {
+		width: 100%;
+		height: 2.5rem;
+		line-height: 2.7rem;
+		margin-bottom: 1rem;
+		font-size: 1.5rem;
+		color: $col-text-dark;
+		text-align: center;
+		@extend %gradient-bg;
+		border: none;
+		border-top: 1px solid $col-glass-05;
+
+		&::placeholder {
+			font-size: 1.5rem;
+			color: $col-text-light;
+		}
+		&:focus {
+			outline: none;
+			box-shadow: 0px 1px 5px rgba(0, 70, 100, 1);
+		}
+	}
+
+	&__races {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 1rem;
+	}
+
+	&__race {
+		flex: 0 1 30%;
+		padding: 1rem;
+	}
+
+	&__race-icon {
+		width: 100%;
+		opacity: 0.5;
+		transform: scale(0.8);
+	}
+
+	&__race-name {
+		font-size: 3rem;
+		font-weight: 700;
+		text-align: center;
+		color: $col-text-medium;
+	}
+}
+.user__race:hover {
+	.user__race-icon {
+		opacity: 1;
+	}
+}
+.user__race.active {
+
+	.user__race-icon{
+		opacity: 1;
+		transform: scale(1);
+		animation: 10s linear infinite rotate;
+	}
+}
+@keyframes rotate {
+	from {transform: rotate(0deg);}
+	to {transform: rotate(360deg);}
+}

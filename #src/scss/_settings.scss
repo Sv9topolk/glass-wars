@@ -1,0 +1,118 @@
+//! Переменные
+// Основные цвета
+$col-bg: rgba(100, 205, 255, 1);
+
+$glass-r: 255;
+$glass-g: 255;
+$glass-b: 255;
+
+$col-glass-01: rgba($glass-r, $glass-g, $glass-b, 0.1);
+$col-glass-02: rgba($glass-r, $glass-g, $glass-b, 0.2);
+$col-glass-03: rgba($glass-r, $glass-g, $glass-b, 0.3);
+$col-glass-04: rgba($glass-r, $glass-g, $glass-b, 0.4);
+$col-glass-05: rgba($glass-r, $glass-g, $glass-b, 0.5);
+$col-glass-06: rgba($glass-r, $glass-g, $glass-b, 0.6);
+$col-glass-07: rgba($glass-r, $glass-g, $glass-b, 0.7);
+$col-glass-08: rgba($glass-r, $glass-g, $glass-b, 0.8);
+
+$col-text-dark: rgba(0, 70, 100, 1);
+$col-text-medium: rgba(0, 100, 155, 1);
+$col-text-light: rgba(0, 170, 255, 1);
+
+
+// Размер ячейки
+$cell-size: 2rem;
+
+
+//! Селекторы-шаблоны
+%gradient-bg {
+	background: linear-gradient(0deg, $col-glass-05 0%, $col-glass-01 100%);
+}
+
+%font-regular {
+	font-family: "Piazzolla" serif;
+	font-weight: 400;
+}
+
+%font-bold {
+	font-family: "Piazzolla" serif;
+	font-weight: 700;
+}
+
+%text-3d {
+	color: rgba(255, 255, 255, 0.8);
+	text-shadow:	1px 1px 1px rgba(100, 205, 255, 1),
+								1px 1px 4px rgba(100, 205, 255, 1),
+								-1px -1px 1px rgba(255, 255, 255, 1),
+								-1px -1px 4px rgba(255, 255, 255, 1);
+}
+
+
+//! Глобальные стили
+html {
+	font-size: 20px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+	min-width: 720px;
+	min-height: 100vh;
+	background-color: $col-bg;
+	@extend %font-regular;
+
+	background-image: url('../media/bg-image.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+
+//! Стили для контейнера приложения
+.content {
+	position: relative;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding-top: 3.5rem;
+	overflow: hidden;
+}
+
+
+//! Отключение элементов
+.tilt-off {
+	transform: rotateX(0) rotateZ(0) perspective(1000px) !important;
+}
+.display-none {
+	display: none !important;
+}
+.hidden {
+	visibility: hidden;
+}
+
+
+//! Media-queries
+// Метрика связана с rem, переходы на 1200px, 1080px, 960px, 840px
+@media screen and (max-width: 1200px) {
+	html {
+		font-size: 18px;
+	}
+}
+
+@media screen and (max-width: 1080px) {
+	html {
+		font-size: 16px;
+	}
+}
+
+@media screen and (max-width: 960px) {
+	html {
+		font-size: 14px;
+	}
+}
+
+@media screen and (max-width: 840px) {
+	html {
+		font-size: 12px;
+	}
+}

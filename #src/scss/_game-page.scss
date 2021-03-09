@@ -1,0 +1,335 @@
+%boards-text-settings {
+	font-size: 1rem;
+	font-weight: 700;
+	text-align: center;
+	color: rgba(255,255,255,1);
+}
+
+//! Контейнер для модуля игры с двумя игровыми зонами
+.game-container {
+	position: relative;
+	display: flex;
+	justify-content: space-between;
+	min-height: calc(100vh - 3.5rem);
+	overflow: hidden;
+}
+
+// Две игровые зоны для компонентов игроков
+.player {
+	flex: 0 0 50%;
+
+	position: relative;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 0.5rem;
+
+	// Птаншеты игроков с доступными зданиями
+	&__mat {
+		position: relative;
+		display: flex;
+		flex-flow: column nowrap;
+		@extend %gradient-bg;
+	}
+
+	// Информация игрока и игровое поле
+	&__area {
+		margin-bottom: 3rem;
+		border: none;
+	}
+}
+
+
+//! Контейнер для всех зданий - название и модель
+.building {
+	display: flex;
+	flex-flow: column nowrap;
+
+	&__name {
+		font-size: 0.8rem;
+		font-weight: 400;
+		text-align: center;
+		user-select: none;
+	}
+
+	&__model {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-width: 8rem;
+		padding: 5px;
+	}
+}
+
+//! Контейнер для информации об игроке - фракция и имя
+.info {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0.5rem 0.5rem 1rem;
+	opacity: 0.5;
+	transition: opacity 0.5s;
+
+	&__player {
+		flex: 1 1 50%;
+		padding-right: 2rem;
+		font-size: 1.5rem;
+		text-align: center;
+		user-select: none;
+	}
+
+	&__symbol {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 3rem;
+		height: 3rem;
+		transform: translate(-50%, -50%);
+	}
+
+	&__race {
+		flex: 1 1 50%;
+		padding-left: 2rem;
+		font-size: 1.5rem;
+		text-align: center;
+		user-select: none;
+	}
+}
+
+//! Контейнер для полей playerL и playerR
+.board {
+	position: relative;
+	flex-grow: 0;
+	flex-shrink: 0;
+	margin: 0.5rem;
+	transform-style: preserve-3d;
+	transform: perspective(1000px);
+
+	// Подложка полей с действиями и выделением клеток
+	&__back {
+		border-collapse: collapse;
+		background-color: rgba(255,255,255,0.4);
+		transform-style: preserve-3d;
+		transform: translateZ(-$cell-size * 1.5) scale(1.05);
+
+		// Стили для всех ячеек таблицы-подложки
+		td, th {
+			width: $cell-size;
+			height: $cell-size;
+			@extend %boards-text-settings;
+		}
+
+		// Верхний ряд подложки - действия игроков
+		.P_bb_PA {
+			
+			> div {
+				width: 80%;
+				height: 80%;
+				margin: 0 auto;
+				border-radius: 50%;
+				border: 2px solid rgba(255,255,255,1);
+				overflow: hidden;
+				opacity: 0;
+				transform: scale(0);
+				transition: transform 0.5s, opacity 0.5s, width 0.5s, height 0.5s;
+			}
+		}
+
+		// Левый и правый столбцы таблицы-подложки
+		.P_bb_LS,
+		.P_bb_RS {
+			width: $cell-size;
+			user-select: none;
+			transform: translateZ($cell-size);
+		}
+
+		// Нижний ряд подложки - нумерация столбцов
+		.P_bb_BS {
+			user-select: none;
+			transform: translateZ($cell-size);
+		}
+	}
+
+	// Игровые поля 8х8
+	&__front {
+		position: absolute;
+		top: $cell-size;
+		left: $cell-size;
+		border-collapse: collapse;
+		background-color: rgba(255,255,255,0.2);
+
+		td {
+			position: relative;
+			width: $cell-size;
+			height: $cell-size;
+		}
+	}
+
+	.js-tilt-glare {
+		transform: translateZ(-$cell-size * 1.5) scale(1.05);
+	}
+}
+
+.game-state {
+	position: absolute;
+	left: 10rem;
+	right: 10rem;
+	bottom: 0;
+	height: 3rem;
+	display: flex;
+	justify-content: space-between;
+	@extend %gradient-bg;
+	border-top: 1px solid $col-glass-05;
+	backdrop-filter: blur(2px);
+	user-select: none;
+
+	&__icon {
+		flex: 0 0 3rem;
+		height: 3rem;
+		padding: 0.5rem;
+	}
+
+	&__message {
+		flex: 1 1 50%;
+		line-height: 3rem;
+		text-align: center;
+	}
+}
+
+//! Выделения клеток
+.board__back {
+
+	[data-status="building"] {
+		background-color: rgba(0,255,0, 0.5);
+	}
+
+	[data-status="foundation"] {
+		background-color: rgba(0,255,0, 0.5);
+	}
+
+	[data-status="crater"] {
+		background-image: url("../media/crater.svg");
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: 100%;
+		background-color: rgba(0,0,0,0.5);
+		opacity: 0.5;
+	}
+}
+
+.board__front {
+
+	.cell-for-foundation {
+		background-color: rgba(0,255,0, 1);
+	}
+}
+
+.foundation {
+	z-index: 10;
+
+	.lvl_1 {
+		opacity: 1;
+	}
+
+	.not-ready {
+		background-image: url("../media/build.svg");
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: 90%;
+		transform: translateZ(-$cell-size * 1.5);
+	}
+}
+
+// Стили для действий игрока
+.P_bb_PA {
+
+	&.total > div {
+		opacity: 0.5;
+		transform: scale(1);
+	}
+
+	&.current > div {
+		width: 100%;
+		height: 100%;
+		border: none;
+		border-radius: 0;
+		background-image: url('../media/select.svg');
+		background-size: 100%;
+		background-position: center center;
+		background-repeat: no-repeat;
+		opacity: 1;
+		transform: translateZ($cell-size * 2) scale(1);
+	}
+
+	&.build > div {
+		width: 100%;
+		height: 100%;
+		border: none;
+		border-radius: 0;
+		background-image: url('../media/build.svg');
+		background-size: 90%;
+		background-position: center center;
+		background-repeat: no-repeat;
+		opacity: 1;
+		transform: translateZ($cell-size) scale(1);
+	}
+
+	&.attack > div {
+		width: 100%;
+		height: 100%;
+		border: none;
+		border-radius: 0;
+		background-image: url('../media/crosshair.svg');
+		background-size: 100%;
+		background-position: center center;
+		background-repeat: no-repeat;
+		opacity: 1;
+		transform: translateZ($cell-size) scale(1);
+	}
+}
+
+// Мишени при атаке
+.aim {
+	position: absolute;
+	z-index: 1000;
+	width: $cell-size;
+	height: $cell-size;
+	background-image: url("../media/aim-red.svg");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 100%;
+
+	&.on-target {
+		background-image: url("../media/aim-green.svg");
+	}
+}
+.aim-big {
+	position: absolute;
+	z-index: 1000;
+	width: $cell-size * 2;
+	height: $cell-size * 2;
+	background-image: url("../media/aim-red.svg");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 100%;
+
+	&.on-target {
+		background-image: url("../media/aim-green.svg");
+	}
+}
+
+.player.active {
+	.info {
+		opacity: 1;
+	}
+
+	.info__symbol {
+		animation: 10s linear infinite rotate-icon;
+	}
+}
+
+@keyframes rotate-icon {
+	from {transform: translate(-50%, -50%) rotate(0deg);}
+	to {transform: translate(-50%, -50%) rotate(360deg);}
+}
