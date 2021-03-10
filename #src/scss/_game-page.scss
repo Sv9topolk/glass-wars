@@ -30,6 +30,7 @@
 		display: flex;
 		flex-flow: column nowrap;
 		@extend %gradient-bg;
+		backdrop-filter: blur(4px);
 	}
 
 	// Информация игрока и игровое поле
@@ -48,6 +49,7 @@
 	&__name {
 		font-size: 0.8rem;
 		font-weight: 400;
+		color: $col-text-dark;
 		text-align: center;
 		user-select: none;
 	}
@@ -75,6 +77,10 @@
 		flex: 1 1 50%;
 		padding-right: 2rem;
 		font-size: 1.5rem;
+		color: $col-text-medium;
+		text-shadow:	0 -1px 1px rgba(255, 255, 255, 1),
+									0 1px 3px rgba(255, 255, 255, 1),
+									0 1px 1px rgba(0, 0, 0, 0.8);
 		text-align: center;
 		user-select: none;
 	}
@@ -92,6 +98,10 @@
 		flex: 1 1 50%;
 		padding-left: 2rem;
 		font-size: 1.5rem;
+		color: $col-text-medium;
+		text-shadow:	0 -1px 1px rgba(255, 255, 255, 1),
+									0 1px 3px rgba(255, 255, 255, 1),
+									0 1px 1px rgba(0, 0, 0, 0.8);
 		text-align: center;
 		user-select: none;
 	}
@@ -109,7 +119,7 @@
 	// Подложка полей с действиями и выделением клеток
 	&__back {
 		border-collapse: collapse;
-		background-color: rgba(255,255,255,0.4);
+		background-color: rgba(255,255,255,0.2);
 		transform-style: preserve-3d;
 		transform: translateZ(-$cell-size * 1.5) scale(1.05);
 
@@ -201,11 +211,11 @@
 .board__back {
 
 	[data-status="building"] {
-		background-color: rgba(0,255,0, 0.5);
+		background-color: rgba(255, 255, 255, 0.4);
 	}
 
 	[data-status="foundation"] {
-		background-color: rgba(0,255,0, 0.5);
+		background-color: rgba(255, 255, 255, 0.4);
 	}
 
 	[data-status="crater"] {
@@ -213,7 +223,7 @@
 		background-repeat: no-repeat;
 		background-position: center center;
 		background-size: 100%;
-		background-color: rgba(0,0,0,0.5);
+		background-color: rgba(0, 0, 0, 0.4);
 		opacity: 0.5;
 	}
 }
@@ -221,7 +231,7 @@
 .board__front {
 
 	.cell-for-foundation {
-		background-color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.7);
 	}
 }
 

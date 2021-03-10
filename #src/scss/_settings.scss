@@ -50,7 +50,7 @@ $cell-size: 2rem;
 
 //! Глобальные стили
 html {
-	font-size: 20px;
+	font-size: 30px;
 	font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -92,7 +92,32 @@ body {
 
 
 //! Media-queries
-// Метрика связана с rem, переходы на 1200px, 1080px, 960px, 840px
+// Метрика связана с rem
+
+@media screen and (max-width: 2000px) {
+	html {
+		font-size: 26px;
+	}
+}
+
+@media screen and (max-width: 1800px) {
+	html {
+		font-size: 24px;
+	}
+}
+
+@media screen and (max-width: 1600px) {
+	html {
+		font-size: 22px;
+	}
+}
+
+@media screen and (max-width: 1400px) {
+	html {
+		font-size: 20px;
+	}
+}
+
 @media screen and (max-width: 1200px) {
 	html {
 		font-size: 18px;

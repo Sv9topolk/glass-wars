@@ -1,5 +1,6 @@
 // Импорты страниц и компонентов SPA
 import tilt from './tilt.js';
+import { Howl, Howler } from 'howler';
 // import firebase from 'firebase';
 import HomePage from './pages/HomePage.js';
 import RulesPage from './pages/RulesPage.js';
@@ -143,3 +144,7 @@ const GlassWarsSPA = (function () {
 })();
 
 GlassWarsSPA('spa', routes, components);
+
+
+
+

@@ -393,6 +393,9 @@
 						// Вычисляем конкретную модель здания по классу targetBldg
 						const bldgNum = +targetBldg.className[4];
 
+						// Превываем, если уровень здания выше уровня игрока
+						if (this.race.buildings[bldgNum].tier > this.currentTier) return;
+
 						// Создаем копию здания для перемещения и помещаем ее под курсор
 						const cloneBldg = this.createBldg(bldgNum);
 						cloneBldg.style.position = 'absolute';
@@ -490,7 +493,6 @@
 				// Метод тратит действие
 				spendAction(actionType) {
 					if (this.actionsLeft <= 0 || this.status === 'passive') return;
-					console.log(this);
 
 					// Обновить отображение действий на поле игрока
 					this.actionsLeft--;
@@ -500,6 +502,8 @@
 					// Вывести сообщение о типе действия
 					let message = (actionType === 'build') ? `${this.name} тратит действие на строительство` : `${this.name} тратит действие на атаку`;
 					showMessage(message, 3, this.side, actionType);
+					if (actionType === 'build') sound.build.play();
+					if (actionType === 'attack') sound.attack.play();
 
 					// Проверить победные условия
 					if (this.checkVictory()) return;
@@ -518,6 +522,7 @@
 					document.querySelector(`.player--${this.side}`).classList.remove('active');
 
 					showMessage(`Ход переходит к ${this.enemy.name}`, 3, this.enemy.side, 'race' + this.enemy.race.num);
+					sound.turn.play();
 				}
 
 				// Метод проверяет победные условия
@@ -567,6 +572,8 @@
 					this.enemy.actionsTotal = 0;
 					this.actionsLeft = 0;
 					this.enemy.actionsTotal = 0;
+
+					sound.win.play();
 				}
 
 				// Метод создает и возвращает DOM-элемент здания
@@ -683,6 +690,7 @@
 					}
 				}
 
+				// Метод создает и возвращает DOM-элемент фундамента
 				createFoundation(bldgNum) {
 					const newFndt = document.createElement('div');
 					const newFndtClass = this.race.buildings[bldgNum].class;
@@ -695,6 +703,7 @@
 					return newFndt;
 				}
 
+				// Метод размещает элемент фундамента в указанных координатах
 				placeFoundation(fndnElem, posX, posY) {
 					let player = this;
 					// Запоминаем модель здания и поле для упрощения доступа к их свойтвам
@@ -830,7 +839,7 @@
 								// Удаляем здание из хэша игрока
 								const bldgCoordX = bldg.dataset.coordinates[1];
 								const bldgCoordY = bldg.dataset.coordinates[4];
-								delete player.buildingsOnBoard[0][`b1_X${bldgCoordX}_Y${bldgCoordY}`];
+								delete player.buildingsOnBoard[0][`b0_X${bldgCoordX}_Y${bldgCoordY}`];
 
 								// Убираем здание с поля игрока
 								bldg.remove();
@@ -887,9 +896,10 @@
 								// Вешаем на нее слушатель на готовность к атаке
 								cellWithRocket.ondragstart = () => false;
 								cellWithRocket.addEventListener('mousedown', attackAction);
+
 								function attackAction(event) {
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0 || player.status === 'passive') return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
@@ -1094,7 +1104,7 @@
 								cellWithRocket.addEventListener('mousedown', attackAction);
 								function attackAction(event) {
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0 || player.status === 'passive') return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
@@ -1255,7 +1265,7 @@
 									let launchCell = event.target;
 									launchCell.ondragstart = () => false;
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0 || player.status === 'passive') return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
@@ -1269,7 +1279,7 @@
 									let cellsBelowAim;
 									document.addEventListener('mousemove', onMouseMove);
 
-									//! Слушатель на drag-end c once: true при успешном срабатывании
+									// Слушатель на drag-end c once: true при успешном срабатывании
 									document.addEventListener('mouseup', (event) => {
 										document.removeEventListener('mousemove', onMouseMove);
 										switchTilt(true);
@@ -1302,7 +1312,7 @@
 											cellBelowAim.back.dataset.status = 'crater';
 										});
 
-										//!!! ТУТ ДОДЕЛАТЬ НА УНИЧТОЖЕНИЕ КЛЕТКИ И ЧЕК УНИЧТОЖЕНИЯ ЗДАНИЯ При успешной атаке уничтожаем саму ракету
+										// При успешной атаке уничтожаем саму ракету
 
 										// Удаляем элемент фундамента ионной пушки, и если он последний - удаляем и ее
 										const launchBldgElem = launchCell.status.parentElement.parentElement;
@@ -1324,12 +1334,6 @@
 
 										// Убираем слушатель с клетки-ракеты, она уничтожена
 										launchCell.removeEventListener('mousedown', attackAction);
-
-										// !!! TEST !!!
-										console.log('Активный игрок');
-										console.log(player);
-										console.log('Пассивный игрок');
-										console.log(enemy);
 
 									}, { once: true });
 
@@ -1405,45 +1409,106 @@
 				`,
 					start: [
 						[0, 0, 0],
-						[0, 0, 2],
-						[1, 6, 5],
-						[1, 6, 6],
-						[1, 6, 7],
-						[1, 7, 5],
-						[1, 7, 6],
-						[1, 7, 7],
+						[1, 0, 1],
+						[0, 4, 6],
+						[0, 6, 6],
+						[2, 4, 7],
+						[2, 5, 7],
+						[2, 6, 7],
+						[2, 7, 7],
+						[2, 6, 5],
+						[2, 7, 5],
 					],
-					attackingBldg: [1, 3, 4],
+					attackingBldg: [2, 4],
 
 					buildings: [
 						{
-							name: 'Командный центр',
+							name: 'Пилон',
 							tier: 1,
-							class: 'b_1_0',
+							class: 'b_2_0',
 							sizeX: 2,
-							sizeY: 2,
+							sizeY: 1,
 							HTML: `
-					<div class="foundation_2x2">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-					</div>
-	
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-					<div class="lvl_4"></div>
+							<div class="foundation_2x1">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+							</div>
+			
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
 						`,
 							foundationHTML: `
-					<div class="foundation_2x2">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-					</div>
+							<div class="foundation_2x1">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+							</div>
+				
+							<div class="lvl_1"></div>
+						`,
 
-					<div class="lvl_1"></div>
+							checkBelowCondition(foundationCell) {
+								return (foundationCell.status === 'empty');
+							},
+
+							checkNearCondition(nearCell) {
+								return true;
+							},
+
+							onPlaceAction(bldg, player, enemy) {
+								return;
+							},
+
+							onDestroyAction(bldg, player, enemy) {
+								// Удаляем здание из хэша игрока
+								const bldgCoordX = bldg.dataset.coordinates[1];
+								const bldgCoordY = bldg.dataset.coordinates[4];
+								delete player.buildingsOnBoard[0][`b0_X${bldgCoordX}_Y${bldgCoordY}`];
+
+								// Убираем здание с поля игрока
+								bldg.remove();
+								const cellsBelow = Array.from(bldg.querySelectorAll('.foundation_2x1')).map(i => i.firstElementChild.cell);
+								cellsBelow.forEach((cellBelow) => {
+									cellBelow.status = 'crater';
+									cellBelow.dataset.status = 'crater';
+									document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
+								});
+							},
+						},
+
+						{
+							name: 'Нексус',
+							tier: 1,
+							class: 'b_2_1',
+							sizeX: 2,
+							sizeY: 3,
+							HTML: `
+							<div class="foundation_2x3">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+								<div class="f_0_2"></div>
+								<div class="f_1_2"></div>
+							</div>
+				
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						`,
+							foundationHTML: `
+							<div class="foundation_2x3">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+								<div class="f_0_2"></div>
+								<div class="f_1_2"></div>
+							</div>
+				
+							<div class="lvl_1"></div>
 						`,
 
 							checkBelowCondition(foundationCell) {
@@ -1456,51 +1521,51 @@
 							},
 
 							onPlaceAction(bldg, player, enemy) {
-								// Игрок учеличивает число своих максимальных действий за ход
-								if (player.actionsTotal < 8) player.actionsTotal++;
+								// Игрок учеличивает число своих максимальных действий за ход на 2
+								if (player.actionsTotal < 7) player.actionsTotal = player.actionsTotal + 2;
 							},
 
 							onDestroyAction(bldg, player, enemy) {
 								// Удаляем здание из хэша игрока
 								const bldgCoordX = bldg.dataset.coordinates[1];
 								const bldgCoordY = bldg.dataset.coordinates[4];
-								delete player.buildingsOnBoard[0][`b1_X${bldgCoordX}_Y${bldgCoordY}`];
+								delete player.buildingsOnBoard[1][`b1_X${bldgCoordX}_Y${bldgCoordY}`];
 
 								// Убираем здание с поля игрока
 								bldg.remove();
-								const cellsBelow = Array.from(bldg.querySelectorAll('.foundation_2x2')).map(i => i.firstElementChild.cell);
+								const cellsBelow = Array.from(bldg.querySelectorAll('.foundation_2x3')).map(i => i.firstElementChild.cell);
 								cellsBelow.forEach((cellBelow) => {
 									cellBelow.status = 'crater';
 									cellBelow.dataset.status = 'crater';
 									document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
 								});
 
-								// Количество максимальных действий игрока за ход уменьшается на 1
-								player.actionsTotal--;
+								// Количество максимальных действий игрока за ход уменьшается на 2
+								player.actionsTotal = player.actionsTotal - 2;
 							},
 						},
 
 						{
-							name: 'Ракета',
+							name: 'Фотонная пушка',
 							tier: 1,
-							class: 'b_1_1',
+							class: 'b_2_2',
 							sizeX: 1,
 							sizeY: 1,
 							HTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
-	
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
+			
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
 						`,
 							foundationHTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
-
-					<div class="lvl_1"></div>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
+			
+							<div class="lvl_1"></div>
 						`,
 
 							checkBelowCondition(foundationCell) {
@@ -1509,21 +1574,23 @@
 
 							checkNearCondition(nearCell) {
 								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '1');
+								return (nearCell.status.closest('.b__').className[4] === '0');
 							},
 
 							onPlaceAction(bldg, player, enemy) {
 								const bldgNum = bldg.className[4];
 								const bldgModel = player.race.buildings[bldgNum];
-								// Находим клетку поля под ракетой
+								// Находим клетку поля под пушкой
 								let cellWithRocket = bldg.querySelector('.foundation_1x1').firstElementChild.cell;
 
 								// Вешаем на нее слушатель на готовность к атаке
+								cellWithRocket.ondragstart = () => false;
 								cellWithRocket.addEventListener('mousedown', attackAction);
+
 								function attackAction(event) {
-									event.target.ondragstart = () => false;
+									event.stopPropagation();
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0) return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
@@ -1548,8 +1615,6 @@
 										if (!cellBelowAim || cellBelowAim.dataset.status !== 'building') return;
 
 										// Иначе цель валидна - атака, -действие, уничтожение ракеты, убираем слушатель клетки поля
-										// Клетка здания уничтожена
-										cellBelowAim.status.dataset.destroy = 'true';
 
 										// Удаляем элемент фундамента атакованного здания из хэша в объекте противника
 										const attackedBldgElem = cellBelowAim.status.parentElement.parentElement;
@@ -1608,7 +1673,7 @@
 								// Удаляем здание из хэша игрока
 								const bldgCoordX = bldg.dataset.coordinates[1];
 								const bldgCoordY = bldg.dataset.coordinates[4];
-								delete player.buildingsOnBoard[1][`b1_X${bldgCoordX}_Y${bldgCoordY}`];
+								delete player.buildingsOnBoard[2][`b2_X${bldgCoordX}_Y${bldgCoordY}`];
 
 								// Убираем здание с поля и меняем статус клеток под ним на кратер
 								bldg.remove();
@@ -1620,33 +1685,33 @@
 						},
 
 						{
-							name: 'Научный центр',
+							name: 'Ассимилятор',
 							tier: 1,
-							class: 'b_1_2',
+							class: 'b_2_3',
 							sizeX: 2,
 							sizeY: 2,
 							HTML: `
-					<div class="foundation_2x2">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-					<div class="lvl_4"></div>
+							<div class="foundation_2x2">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
 						`,
 							foundationHTML: `
-					<div class="foundation_2x2">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-					</div>
-
-					<div class="lvl_1"></div>
+							<div class="foundation_2x2">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+							</div>
+				
+							<div class="lvl_1"></div>
 						`,
 
 							checkBelowCondition(foundationCell) {
@@ -1655,80 +1720,25 @@
 
 							checkNearCondition(nearCell) {
 								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '0' ||
-									nearCell.status.closest('.b__').className[4] === '2');
+								return (nearCell.status.closest('.b__').className[4] === '0');
 							},
 
 							onPlaceAction(bldg, player, enemy) {
-								// Если это первый научный центр - повышаем тир игрока
+								// Если это первый ассимилятор - повышаем тир игрока
 								if (player.currentTier < 2) player.currentTier = 2;
-							},
 
-							onDestroyAction(bldg, player, enemy) {
-								// Удаляем здание из хэша игрока
-								const bldgCoordX = bldg.dataset.coordinates[1];
-								const bldgCoordY = bldg.dataset.coordinates[4];
-								delete player.buildingsOnBoard[2][`b2_X${bldgCoordX}_Y${bldgCoordY}`];
-
-								// Убираем здание с поля и меняем статусы клеток под ним на кратер
-								bldg.remove();
-								const cellsBelow = Array.from(bldg.querySelectorAll('.foundation_2x2')).map(i => i.firstElementChild.cell);
-								cellsBelow.forEach((cellBelow) => {
-									cellBelow.status = 'crater';
-									cellBelow.dataset.status = 'crater';
-									document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
-								});
-
-								// Если уничтожен последний научный центр - снижаем тир тир игрока
-								if (Object.keys(player.buildingsOnBoard[2]).length === 0) player.currentTier = 1;
-							},
-						},
-
-						{
-							name: 'Сейсмобомба',
-							tier: 2,
-							class: 'b_1_3',
-							sizeX: 1,
-							sizeY: 1,
-							HTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-				`,
-							foundationHTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-				`,
-
-							checkBelowCondition(foundationCell) {
-								return (foundationCell.status === 'empty');
-							},
-
-							checkNearCondition(nearCell) {
-								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '2' ||
-									nearCell.status.closest('.b__').className[4] === '3');
-							},
-
-							onPlaceAction(bldg, player, enemy) {
 								const bldgNum = bldg.className[4];
-								const bldgModel = player.race.buildings[bldgNum];
-								// Находим клетку поля под ракетой
-								let cellWithRocket = bldg.querySelector('.foundation_1x1').firstElementChild.cell;
+								player.race.buildings[bldgNum];
 
-								// Вешаем на нее слушатель на готовность к атаке
-								cellWithRocket.addEventListener('mousedown', attackAction);
+								// Находим клетки поля под Ассимилятором
+								const launchCells = Array.from(bldg.firstElementChild.children).map((fndtCell) => fndtCell.cell);
+								// И на каждую вешаем слушатель на начало атаки
+								launchCells.forEach((launch) => launch.addEventListener('mousedown', attackAction));
+
 								function attackAction(event) {
-									event.target.ondragstart = () => false;
+									let launchCell = event.target;
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0) return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
@@ -1775,13 +1785,26 @@
 											enemy.foundationOnBoard = false;
 										}
 
-										// При успешной атаке уничтожаем саму ракету
-										bldgModel.onDestroyAction(bldg, player, enemy);
+										// Удаляем элемент фундамента Ассимилятора, и если он последний - удаляем и его
+										const launchBldgElem = launchCell.status.parentElement.parentElement;
+										const launchBldgX = launchBldgElem.dataset.coordinates[1];
+										const launchBldgY = launchBldgElem.dataset.coordinates[4];
+										const playerObjBldg = player.buildingsOnBoard[3][`b3_X${launchBldgX}_Y${launchBldgY}`];
+										delete playerObjBldg.unbrokenFndtElems[`f3_X${launchCell.id[7]}_Y${launchCell.id[9]}`];
+										// Если это был последний фундамент Анилилятора - уничтожить его
+										if (Object.keys(playerObjBldg.unbrokenFndtElems).length === 0) {
+											player.race.buildings[3].onDestroyAction(launchBldgElem, player, enemy);
+										}
+										// Под уничтоженной клеткой фундамента оставляем кратер
+										launchCell.status = 'crater';
+										launchCell.dataset.status = 'crater';
+										launchCell.back.dataset.status = 'crater';
+
 										// Игрок тратит действие на атаку
 										player.spendAction('attack');
 
 										// Убираем слушатель с клетки-ракеты, она уничтожена
-										cellWithRocket.removeEventListener('mousedown', attackAction);
+										launchCell.removeEventListener('mousedown', attackAction);
 
 									}, { once: true });
 
@@ -1820,52 +1843,47 @@
 
 								// Убираем здание с поля и меняем статус клеток под ним на кратер
 								bldg.remove();
-								const cellBelow = bldg.querySelector('.foundation_1x1').firstElementChild.cell;
-								cellBelow.status = 'crater';
-								cellBelow.dataset.status = 'crater';
-								document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
+								const cellsBelow = Array.from(bldg.querySelectorAll('.foundation_2x2')).map(i => i.firstElementChild.cell);
+								cellsBelow.forEach((cellBelow) => {
+									cellBelow.status = 'crater';
+									cellBelow.dataset.status = 'crater';
+									cellBelow.back.dataset.status = 'crater';
+								});
+
+								// Если уничтожен последний ассимилятор - снижаем тир игрока
+								if (Object.keys(player.buildingsOnBoard[3]).length === 0) player.currentTier = 1;
 							},
 						},
 
 						{
-							name: 'Ионная пушка',
+							name: 'Анигилятор',
 							tier: 2,
-							class: 'b_1_4',
-							sizeX: 3,
-							sizeY: 3,
+							class: 'b_2_4',
+							sizeX: 2,
+							sizeY: 2,
 							HTML: `
-					<div class="foundation_3x3">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_2_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-						<div class="f_2_1"></div>
-						<div class="f_0_2"></div>
-						<div class="f_1_2"></div>
-						<div class="f_2_2"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-					<div class="lvl_4"></div>
-				`,
+							<div class="foundation_2x2">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						`,
 							foundationHTML: `
-					<div class="foundation_3x3">
-					<div class="f_0_0"></div>
-					<div class="f_1_0"></div>
-					<div class="f_2_0"></div>
-					<div class="f_0_1"></div>
-					<div class="f_1_1"></div>
-					<div class="f_2_1"></div>
-					<div class="f_0_2"></div>
-					<div class="f_1_2"></div>
-					<div class="f_2_2"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-				`,
+							<div class="foundation_2x2">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+						`,
 
 							checkBelowCondition(foundationCell) {
 								return (foundationCell.status === 'empty');
@@ -1873,23 +1891,22 @@
 
 							checkNearCondition(nearCell) {
 								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '2' ||
-									nearCell.status.closest('.b__').className[4] === '4');
+								return (nearCell.status.closest('.b__').className[4] === '0');
 							},
 
 							onPlaceAction(bldg, player, enemy) {
 								const bldgNum = bldg.className[4];
 								player.race.buildings[bldgNum];
 
-								// Находим клетки поля под ионной пушкой
+								// Находим клетки поля под Анигилятором
 								const launchCells = Array.from(bldg.firstElementChild.children).map((fndtCell) => fndtCell.cell);
 								// И на каждую вешаем слушатель на начало атаки
 								launchCells.forEach((launch) => launch.addEventListener('mousedown', attackAction));
+
 								function attackAction(event) {
 									let launchCell = event.target;
-									launchCell.ondragstart = () => false;
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0) return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
@@ -1903,7 +1920,7 @@
 									let cellsBelowAim;
 									document.addEventListener('mousemove', onMouseMove);
 
-									//! Слушатель на drag-end c once: true при успешном срабатывании
+									// Слушатель на drag-end c once: true при успешном срабатывании
 									document.addEventListener('mouseup', (event) => {
 										document.removeEventListener('mousemove', onMouseMove);
 										switchTilt(true);
@@ -1936,15 +1953,13 @@
 											cellBelowAim.back.dataset.status = 'crater';
 										});
 
-										//!!! ТУТ ДОДЕЛАТЬ НА УНИЧТОЖЕНИЕ КЛЕТКИ И ЧЕК УНИЧТОЖЕНИЯ ЗДАНИЯ При успешной атаке уничтожаем саму ракету
-
-										// Удаляем элемент фундамента ионной пушки, и если он последний - удаляем и ее
+										// Удаляем элемент фундамента Анилилятора, и если он последний - удаляем и ее
 										const launchBldgElem = launchCell.status.parentElement.parentElement;
 										const launchBldgX = launchBldgElem.dataset.coordinates[1];
 										const launchBldgY = launchBldgElem.dataset.coordinates[4];
 										const playerObjBldg = player.buildingsOnBoard[4][`b${4}_X${launchBldgX}_Y${launchBldgY}`];
 										delete playerObjBldg.unbrokenFndtElems[`f${4}_X${launchCell.id[7]}_Y${launchCell.id[9]}`];
-										// Если это был последний фундамент ионной пушки - уничтожить ее
+										// Если это был последний фундамент Анилилятора - уничтожить ее
 										if (Object.keys(playerObjBldg.unbrokenFndtElems).length === 0) {
 											player.race.buildings[4].onDestroyAction(launchBldgElem, player, enemy);
 										}
@@ -1958,12 +1973,6 @@
 
 										// Убираем слушатель с клетки-ракеты, она уничтожена
 										launchCell.removeEventListener('mousedown', attackAction);
-
-										// !!! TEST !!!
-										console.log('Активный игрок');
-										console.log(player);
-										console.log('Пассивный игрок');
-										console.log(enemy);
 
 									}, { once: true });
 
@@ -2043,17 +2052,14 @@
 						[1, 6, 5],
 						[1, 6, 6],
 						[1, 6, 7],
-						[1, 7, 5],
-						[1, 7, 6],
-						[1, 7, 7],
 					],
 					attackingBldg: [1, 3, 4],
 
 					buildings: [
 						{
-							name: 'Командный центр',
+							name: 'Цитадель',
 							tier: 1,
-							class: 'b_1_0',
+							class: 'b_3_0',
 							sizeX: 2,
 							sizeY: 2,
 							HTML: `
@@ -2086,7 +2092,7 @@
 
 							checkNearCondition(nearCell) {
 								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '0');
+								return (nearCell.status.closest('.b__'));
 							},
 
 							onPlaceAction(bldg, player, enemy) {
@@ -2098,7 +2104,7 @@
 								// Удаляем здание из хэша игрока
 								const bldgCoordX = bldg.dataset.coordinates[1];
 								const bldgCoordY = bldg.dataset.coordinates[4];
-								delete player.buildingsOnBoard[0][`b1_X${bldgCoordX}_Y${bldgCoordY}`];
+								delete player.buildingsOnBoard[0][`b0_X${bldgCoordX}_Y${bldgCoordY}`];
 
 								// Убираем здание с поля игрока
 								bldg.remove();
@@ -2115,27 +2121,29 @@
 						},
 
 						{
-							name: 'Ракета',
+							name: 'Тотем',
 							tier: 1,
-							class: 'b_1_1',
-							sizeX: 1,
+							class: 'b_3_1',
+							sizeX: 2,
 							sizeY: 1,
 							HTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
-	
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-				`,
+							<div class="foundation_2x1">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+						`,
 							foundationHTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-				`,
+							<div class="foundation_2x1">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+							</div>
+			
+							<div class="lvl_1"></div>
+						`,
 
 							checkBelowCondition(foundationCell) {
 								return (foundationCell.status === 'empty');
@@ -2143,21 +2151,22 @@
 
 							checkNearCondition(nearCell) {
 								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '1');
+								return (nearCell.status.closest('.b__'));
 							},
 
 							onPlaceAction(bldg, player, enemy) {
 								const bldgNum = bldg.className[4];
-								const bldgModel = player.race.buildings[bldgNum];
-								// Находим клетку поля под ракетой
-								let cellWithRocket = bldg.querySelector('.foundation_1x1').firstElementChild.cell;
+								player.race.buildings[bldgNum];
 
-								// Вешаем на нее слушатель на готовность к атаке
-								cellWithRocket.addEventListener('mousedown', attackAction);
+								// Находим клетки поля под Тотемом
+								const launchCells = Array.from(bldg.firstElementChild.children).map((fndtCell) => fndtCell.cell);
+								// И на каждую вешаем слушатель на начало атаки
+								launchCells.forEach((launch) => launch.addEventListener('mousedown', attackAction));
+
 								function attackAction(event) {
-									event.target.ondragstart = () => false;
+									let launchCell = event.target;
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0) return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
@@ -2172,7 +2181,7 @@
 									document.addEventListener('mousemove', onMouseMove);
 
 									// Слушатель на drag-end c once: true при успешном срабатывании
-									document.addEventListener('mouseup', () => {
+									document.addEventListener('mouseup', (event) => {
 										document.removeEventListener('mousemove', onMouseMove);
 										switchTilt(true);
 										$aim.remove();
@@ -2182,8 +2191,6 @@
 										if (!cellBelowAim || cellBelowAim.dataset.status !== 'building') return;
 
 										// Иначе цель валидна - атака, -действие, уничтожение ракеты, убираем слушатель клетки поля
-										// Клетка здания уничтожена
-										cellBelowAim.status.dataset.destroy = 'true';
 
 										// Удаляем элемент фундамента атакованного здания из хэша в объекте противника
 										const attackedBldgElem = cellBelowAim.status.parentElement.parentElement;
@@ -2202,13 +2209,26 @@
 										cellBelowAim.dataset.status = 'crater';
 										document.getElementById(cellBelowAim.id.replace('f', 'b')).dataset.status = 'crater';
 
-										// При успешной атаке уничтожаем саму ракету
-										bldgModel.onDestroyAction(bldg, player, enemy);
+										// Удаляем элемент фундамента Тотема, и если он последний - удаляем и его
+										const launchBldgElem = launchCell.status.parentElement.parentElement;
+										const launchBldgX = launchBldgElem.dataset.coordinates[1];
+										const launchBldgY = launchBldgElem.dataset.coordinates[4];
+										const playerObjBldg = player.buildingsOnBoard[1][`b1_X${launchBldgX}_Y${launchBldgY}`];
+										delete playerObjBldg.unbrokenFndtElems[`f1_X${launchCell.id[7]}_Y${launchCell.id[9]}`];
+										// Если это был последний фундамент Тотема - уничтожить его
+										if (Object.keys(playerObjBldg.unbrokenFndtElems).length === 0) {
+											player.race.buildings[1].onDestroyAction(launchBldgElem, player, enemy);
+										}
+										// Под уничтоженной клеткой фундамента оставляем кратер
+										launchCell.status = 'crater';
+										launchCell.dataset.status = 'crater';
+										launchCell.back.dataset.status = 'crater';
+
 										// Игрок тратит действие на атаку
 										player.spendAction('attack');
 
 										// Убираем слушатель с клетки-ракеты, она уничтожена
-										cellWithRocket.removeEventListener('mousedown', attackAction);
+										launchCell.removeEventListener('mousedown', attackAction);
 
 									}, { once: true });
 
@@ -2244,44 +2264,50 @@
 								const bldgCoordY = bldg.dataset.coordinates[4];
 								delete player.buildingsOnBoard[1][`b1_X${bldgCoordX}_Y${bldgCoordY}`];
 
-								// Убираем здание с поля и меняем статус клеток под ним на кратер
+								// Убираем здание с поля игрока
 								bldg.remove();
-								const cellBelow = bldg.querySelector('.foundation_1x1').firstElementChild.cell;
-								cellBelow.status = 'crater';
-								cellBelow.dataset.status = 'crater';
-								document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
+								const cellsBelow = Array.from(bldg.querySelectorAll('.foundation_2x1')).map(i => i.firstElementChild.cell);
+								cellsBelow.forEach((cellBelow) => {
+									cellBelow.status = 'crater';
+									cellBelow.dataset.status = 'crater';
+									document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
+								});
 							},
 						},
 
 						{
-							name: 'Научный центр',
+							name: 'Варп-портал',
 							tier: 1,
-							class: 'b_1_2',
+							class: 'b_3_2',
 							sizeX: 2,
-							sizeY: 2,
+							sizeY: 3,
 							HTML: `
-					<div class="foundation_2x2">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-					<div class="lvl_4"></div>
-				`,
+							<div class="foundation_2x3">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+								<div class="f_0_2"></div>
+								<div class="f_1_2"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						`,
 							foundationHTML: `
-					<div class="foundation_2x2">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-					</div>
-
-					<div class="lvl_1"></div>
-				`,
+							<div class="foundation_2x3">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+								<div class="f_0_2"></div>
+								<div class="f_1_2"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+						`,
 
 							checkBelowCondition(foundationCell) {
 								return (foundationCell.status === 'empty');
@@ -2289,12 +2315,11 @@
 
 							checkNearCondition(nearCell) {
 								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '0' ||
-									nearCell.status.closest('.b__').className[4] === '2');
+								return (nearCell.status.closest('.b__'));
 							},
 
 							onPlaceAction(bldg, player, enemy) {
-								// Если это первый научный центр - повышаем тир игрока
+								// Если это первый портал - повышаем тир игрока
 								if (player.currentTier < 2) player.currentTier = 2;
 							},
 
@@ -2313,42 +2338,40 @@
 									document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
 								});
 
-								// Если уничтожен последний научный центр - снижаем тир тир игрока
+								// Если уничтожен последний портал - снижаем тир тир игрока
 								if (Object.keys(player.buildingsOnBoard[2]).length === 0) player.currentTier = 1;
 							},
 						},
 
 						{
-							name: 'Сейсмобомба',
+							name: 'Маяк пустоты',
 							tier: 2,
-							class: 'b_1_3',
+							class: 'b_3_3',
 							sizeX: 1,
 							sizeY: 1,
 							HTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
 
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-				`,
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+						`,
 							foundationHTML: `
-					<div class="foundation_1x1">
-						<div class="f_0_0"></div>
-					</div>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
 
-					<div class="lvl_1"></div>
-				`,
+							<div class="lvl_1"></div>
+						`,
 
 							checkBelowCondition(foundationCell) {
 								return (foundationCell.status === 'empty');
 							},
 
 							checkNearCondition(nearCell) {
-								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '2' ||
-									nearCell.status.closest('.b__').className[4] === '3');
+								return true;
 							},
 
 							onPlaceAction(bldg, player, enemy) {
@@ -2462,142 +2485,99 @@
 						},
 
 						{
-							name: 'Ионная пушка',
+							name: 'Маяк гнева',
 							tier: 2,
-							class: 'b_1_4',
-							sizeX: 3,
-							sizeY: 3,
+							class: 'b_3_4',
+							sizeX: 1,
+							sizeY: 1,
 							HTML: `
-					<div class="foundation_3x3">
-						<div class="f_0_0"></div>
-						<div class="f_1_0"></div>
-						<div class="f_2_0"></div>
-						<div class="f_0_1"></div>
-						<div class="f_1_1"></div>
-						<div class="f_2_1"></div>
-						<div class="f_0_2"></div>
-						<div class="f_1_2"></div>
-						<div class="f_2_2"></div>
-					</div>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
 
-					<div class="lvl_1"></div>
-					<div class="lvl_2"></div>
-					<div class="lvl_3"></div>
-					<div class="lvl_4"></div>
-				`,
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+						`,
 							foundationHTML: `
-					<div class="foundation_3x3">
-					<div class="f_0_0"></div>
-					<div class="f_1_0"></div>
-					<div class="f_2_0"></div>
-					<div class="f_0_1"></div>
-					<div class="f_1_1"></div>
-					<div class="f_2_1"></div>
-					<div class="f_0_2"></div>
-					<div class="f_1_2"></div>
-					<div class="f_2_2"></div>
-					</div>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
 
-					<div class="lvl_1"></div>
-				`,
+							<div class="lvl_1"></div>
+						`,
 
 							checkBelowCondition(foundationCell) {
 								return (foundationCell.status === 'empty');
 							},
 
 							checkNearCondition(nearCell) {
-								if (typeof nearCell.status === 'string') return false;
-								return (nearCell.status.closest('.b__').className[4] === '2' ||
-									nearCell.status.closest('.b__').className[4] === '4');
+								return true;
 							},
 
 							onPlaceAction(bldg, player, enemy) {
 								const bldgNum = bldg.className[4];
-								player.race.buildings[bldgNum];
+								const bldgModel = player.race.buildings[bldgNum];
+								// Находим клетку поля под пушкой
+								let cellWithRocket = bldg.querySelector('.foundation_1x1').firstElementChild.cell;
 
-								// Находим клетки поля под ионной пушкой
-								const launchCells = Array.from(bldg.firstElementChild.children).map((fndtCell) => fndtCell.cell);
-								// И на каждую вешаем слушатель на начало атаки
-								launchCells.forEach((launch) => launch.addEventListener('mousedown', attackAction));
+								// Вешаем на нее слушатель на готовность к атаке
+								cellWithRocket.ondragstart = () => false;
+								cellWithRocket.addEventListener('mousedown', attackAction);
+
 								function attackAction(event) {
-									let launchCell = event.target;
-									launchCell.ondragstart = () => false;
+									event.stopPropagation();
 									// Сработает только при наличии у игрока действий
-									if (player.actionsLeft <= 0) return;
+									if (player.actionsLeft <= 0 || player.status === 'passive' || typeof event.target.status === 'string') return;
 
 									switchTilt(false);
 
 									// Создаем мишень и помещаем ее под курсор
 									const $aim = document.createElement('div');
-									$aim.classList.add('aim-big');
+									$aim.classList.add('aim');
 									document.body.append($aim);
 									moveAt(event.pageX, event.pageY);
 
 									// Слушатель на перетаскивание мишени
-									let cellsBelowAim;
+									let cellBelowAim;
 									document.addEventListener('mousemove', onMouseMove);
 
-									//! Слушатель на drag-end c once: true при успешном срабатывании
-									document.addEventListener('mouseup', (event) => {
+									// Слушатель на drag-end c once: true при успешном срабатывании
+									document.addEventListener('mouseup', () => {
 										document.removeEventListener('mousemove', onMouseMove);
 										switchTilt(true);
 										$aim.remove();
 
 										// Проверяем клетки под прицелом
-										// Если невалидная - тогда ничего не делаем и прерываем
-										if (!(cellsBelowAim.filter(cell => !!cell).length === 4 &&
-											cellsBelowAim.filter(cell => (cell && cell.dataset.status === 'building')).length > 0)) return;
+										// Если невалидная - тогда ничего не делаем и прерываем 
+										if (!cellBelowAim || cellBelowAim.dataset.status !== 'building') return;
 
 										// Иначе цель валидна - атака, -действие, уничтожение ракеты, убираем слушатель клетки поля
 
 										// Удаляем элемент фундамента атакованного здания из хэша в объекте противника
-										let targets = cellsBelowAim.filter(cell => cell.dataset.status === 'building');
-										targets.forEach(cellBelowAim => {
-											const attackedBldgElem = cellBelowAim.status.parentElement.parentElement;
-											const attackedBldgNum = +attackedBldgElem.className[4];
-											const attackedBldgX = attackedBldgElem.dataset.coordinates[1];
-											const attackedBldgY = attackedBldgElem.dataset.coordinates[4];
-											const enemyObjBldg = enemy.buildingsOnBoard[attackedBldgNum][`b${attackedBldgNum}_X${attackedBldgX}_Y${attackedBldgY}`];
-											delete enemyObjBldg.unbrokenFndtElems[`f${attackedBldgNum}_X${cellBelowAim.id[7]}_Y${cellBelowAim.id[9]}`];
-											// Если это был последний фундамент этого здания - уничтожить здание
-											if (Object.keys(enemyObjBldg.unbrokenFndtElems).length === 0) {
-												enemy.race.buildings[attackedBldgNum].onDestroyAction(attackedBldgElem, enemy, player);
-											}
-
-											// Статус клеток полей back и front также crater
-											cellBelowAim.status = 'crater';
-											cellBelowAim.dataset.status = 'crater';
-											cellBelowAim.back.dataset.status = 'crater';
-										});
-
-										//!!! ТУТ ДОДЕЛАТЬ НА УНИЧТОЖЕНИЕ КЛЕТКИ И ЧЕК УНИЧТОЖЕНИЯ ЗДАНИЯ При успешной атаке уничтожаем саму ракету
-
-										// Удаляем элемент фундамента ионной пушки, и если он последний - удаляем и ее
-										const launchBldgElem = launchCell.status.parentElement.parentElement;
-										const launchBldgX = launchBldgElem.dataset.coordinates[1];
-										const launchBldgY = launchBldgElem.dataset.coordinates[4];
-										const playerObjBldg = player.buildingsOnBoard[4][`b${4}_X${launchBldgX}_Y${launchBldgY}`];
-										delete playerObjBldg.unbrokenFndtElems[`f${4}_X${launchCell.id[7]}_Y${launchCell.id[9]}`];
-										// Если это был последний фундамент ионной пушки - уничтожить ее
-										if (Object.keys(playerObjBldg.unbrokenFndtElems).length === 0) {
-											player.race.buildings[4].onDestroyAction(launchBldgElem, player, enemy);
+										const attackedBldgElem = cellBelowAim.status.parentElement.parentElement;
+										const attackedBldgNum = +attackedBldgElem.className[4];
+										const attackedBldgX = attackedBldgElem.dataset.coordinates[1];
+										const attackedBldgY = attackedBldgElem.dataset.coordinates[4];
+										const enemyObjBldg = enemy.buildingsOnBoard[attackedBldgNum][`b${attackedBldgNum}_X${attackedBldgX}_Y${attackedBldgY}`];
+										delete enemyObjBldg.unbrokenFndtElems[`f${attackedBldgNum}_X${cellBelowAim.id[7]}_Y${cellBelowAim.id[9]}`];
+										// Если это был последний фундамент этого здания - уничтожить здание
+										if (Object.keys(enemyObjBldg.unbrokenFndtElems).length === 0) {
+											enemy.race.buildings[attackedBldgNum].onDestroyAction(attackedBldgElem, enemy, player);
 										}
-										// Под уничтоженной клеткой фундамента оставляем кратер
-										launchCell.status = 'crater';
-										launchCell.dataset.status = 'crater';
-										launchCell.back.dataset.status = 'crater';
 
+										// Статус клеток полей back и front также crater
+										cellBelowAim.status = 'crater';
+										cellBelowAim.dataset.status = 'crater';
+										document.getElementById(cellBelowAim.id.replace('f', 'b')).dataset.status = 'crater';
+
+										// При успешной атаке уничтожаем саму ракету
+										bldgModel.onDestroyAction(bldg, player, enemy);
 										// Игрок тратит действие на атаку
 										player.spendAction('attack');
 
 										// Убираем слушатель с клетки-ракеты, она уничтожена
-										launchCell.removeEventListener('mousedown', attackAction);
-
-										// !!! TEST !!!
-										console.log('Активный игрок');
-										console.log(player);
-										console.log('Пассивный игрок');
-										console.log(enemy);
+										cellWithRocket.removeEventListener('mousedown', attackAction);
 
 									}, { once: true });
 
@@ -2611,22 +2591,11 @@
 
 									function onMouseMove(event) {
 										const halfAimSize = $aim.offsetWidth / 2;
-										const quaterAimSize = $aim.offsetWidth / 4;
 										$aim.hidden = true;
-										// Находим массив из клеток поля противника под мишенью, если ячейки нету тогда вместо нее [null]
-										cellsBelowAim = [
-											document.elementFromPoint(event.clientX - quaterAimSize, event.clientY - quaterAimSize).closest(`.player--${enemy.side} .board__front td`),
-											document.elementFromPoint(event.clientX + quaterAimSize, event.clientY - quaterAimSize).closest(`.player--${enemy.side} .board__front td`),
-											document.elementFromPoint(event.clientX - quaterAimSize, event.clientY + quaterAimSize).closest(`.player--${enemy.side} .board__front td`),
-											document.elementFromPoint(event.clientX + quaterAimSize, event.clientY + quaterAimSize).closest(`.player--${enemy.side} .board__front td`),
-										];
-
-										// Если среди найденных клеток 4 (не выходит за границу поля), и среди них есть хоть одна со зданием - заххватить цель
-										if (cellsBelowAim.filter(cell => !!cell).length === 4 &&
-											cellsBelowAim.filter(cell => (cell && cell.dataset.status === 'building')).length > 0) {
-
+										cellBelowAim = document.elementFromPoint(event.clientX, event.clientY).closest(`.player--${enemy.side} [data-status="building"]`);
+										if (cellBelowAim) {
 											$aim.classList.add('on-target');
-											let cellBelowCoord = cellsBelowAim[0].getBoundingClientRect();
+											let cellBelowCoord = cellBelowAim.getBoundingClientRect();
 											moveAt(cellBelowCoord.left, cellBelowCoord.top);
 										} else {
 											$aim.classList.remove('on-target');
@@ -2642,16 +2611,14 @@
 								// Удаляем здание из хэша игрока
 								const bldgCoordX = bldg.dataset.coordinates[1];
 								const bldgCoordY = bldg.dataset.coordinates[4];
-								delete player.buildingsOnBoard[4][`b4_X${bldgCoordX}_Y${bldgCoordY}`];
+								delete player.buildingsOnBoard[2][`b2_X${bldgCoordX}_Y${bldgCoordY}`];
 
-								// Убираем здание с поля и меняем статусы клеток под ним на кратер
+								// Убираем здание с поля и меняем статус клеток под ним на кратер
 								bldg.remove();
-								const cellsBelow = Array.from(bldg.querySelectorAll('.foundation_3x3')).map(i => i.firstElementChild.cell);
-								cellsBelow.forEach((cellBelow) => {
-									cellBelow.status = 'crater';
-									cellBelow.dataset.status = 'crater';
-									cellBelow.back.dataset.status = 'crater';
-								});
+								const cellBelow = bldg.querySelector('.foundation_1x1').firstElementChild.cell;
+								cellBelow.status = 'crater';
+								cellBelow.dataset.status = 'crater';
+								document.getElementById(cellBelow.id.replace('f', 'b')).dataset.status = 'crater';
 							},
 
 						},
@@ -2743,6 +2710,13 @@
 					glares.forEach((div) => div.classList.add('display-none'));
 				}
 			}
+
+			const sound = {
+				attack: new Howl({ src: ['../media/attack.mp3'] }),
+				build: new Howl({ src: ['../media/build.mp3'] }),
+				turn: new Howl({ src: ['../media/turn.mp3'] }),
+				win: new Howl({ src: ['../media/applause.mp3'] }),
+			};
 
 		}
 	};

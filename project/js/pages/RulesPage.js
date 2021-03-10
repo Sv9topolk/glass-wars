@@ -97,22 +97,352 @@
 
 				rulesPages.general = {
 					title: 'Основные правила игры',
-					HTML: `GENERAL RULES`
+					HTML: `
+					<h1 class="rules-info__title">Glass wars - основные правила игры</h1>
+					<p class="rules-info__text">Перед вами пошаговая стратегия для двух пользователей. Игроки выбирают одну из трех ассиметричных фракций и пытаются уничтожить противника, строя здания на индивидуальном поле размером 8х8 клеток, и атакуя здания на поле соперника. Кроме поля, в игровой зоне игрока имеется планшет с доступными для постройки пятью зданиями.</p>
+					<p class="rules-info__text">Игра длится несколько раундов, в течение которых игроки ходят по очереди, совершая действия. Количество действий зависит от наличия основных зданий на поле. Доступны два типа действий:</p>
+					<p class="rules-info__text"><img class="rules-info__icon" src="../media/build.svg" alt="иконка действия строительства"> - строительство - перетащите здание с планшета на поле, создав фундамент. Для постройки здания необходимо потратить по действию на каждый элемент фундамента, кликнув на шестеренку над ним. Каждое здание имеет условия постройки (ограничения выбора клеток для строительства, требуемый уровень) и полезные свойства.</p>
+					<p class="rules-info__text"><img class="rules-info__icon" src="../media/crosshair.svg" alt="иконка действия атаки"> - атака - кликните на свое атакующее здание и перенесите появившуюся мишень на легальную цель на поле соперника. После успешной атаки клетки атакованный элемент вражеского здания будет уничтожен, как и ваше атакующее здание. Такие клетки недоступны для строительства до конца игры.</p>
+					<p class="rules-info__text">Игра заканчивается поражением игрока, который не сможет совернить любое действие в свой ход. Это может произойти при потере всех основных зданий или отсутствии возможности построить здание или атаковать (либо слишком много, либо нет действий.) Для победы грамотно выбирайте здания и клетки для строительства, подбирайте оптимальный момент для атаки и используйте сильные стороны своей фракции. И да пребудет с вами Сила!</p>
+				`,
 				};
 
 				rulesPages.race1 = {
 					title: 'Правила игры за Империю',
-					HTML: `EMPIRE RULES`
+					HTML: `
+					<h1 class="rules-info__title">Правила игры за Империю</h1>
+
+					<div class="rules-info__bldg-info">
+						<div class="rules-info__bldg-cont">
+							<div class="b_1_0 rules-info__bldg-model rules-info__bldg-model--2x2" data-tilt>
+								<div class="foundation_2x2">
+									<div class="f_0_0"></div>
+									<div class="f_1_0"></div>
+									<div class="f_0_1"></div>
+									<div class="f_1_1"></div>
+								</div>
+
+								<div class="lvl_1"></div>
+								<div class="lvl_2"></div>
+								<div class="lvl_3"></div>
+								<div class="lvl_4"></div>
+							</div>
+						</div>
+
+						<div class="rules-info__bldg-rules">
+							<p class="rules-info__text">Командный центр - основное здание империи. Каждый центр увеличивает количество доступных действий в ход на 1. Можно строить рядом с другим командным центром.</p>
+						</div>
+						
+						<div class="br"></div>
+
+						<div class="rules-info__bldg-cont">
+							<div class="b_1_1 rules-info__bldg-model rules-info__bldg-model--1x1" data-tilt>
+								<div class="foundation_1x1">
+									<div class="f_0_0"></div>
+								</div>
+
+								<div class="lvl_1"></div>
+								<div class="lvl_2"></div>
+								<div class="lvl_3"></div>
+							</div>
+						</div>
+
+						<div class="rules-info__bldg-rules">
+							<p class="rules-info__text">Ракета - атакующее здание. При выполнении действия атаки уничтожает элемент здания противника и уничтожается сама. Строится рядом с другой ракетой.</p>
+						</div>
+
+						<div class="br"></div>
+
+						<div class="rules-info__bldg-cont">
+							<div class="b_1_2 rules-info__bldg-model rules-info__bldg-model--2x2" data-tilt>
+								<div class="foundation_2x2">
+									<div class="f_0_0"></div>
+									<div class="f_1_0"></div>
+									<div class="f_0_1"></div>
+									<div class="f_1_1"></div>
+								</div>
+		
+								<div class="lvl_1"></div>
+								<div class="lvl_2"></div>
+								<div class="lvl_3"></div>
+								<div class="lvl_4"></div>
+							</div>
+						</div>
+
+						<div class="rules-info__bldg-rules">
+							<p class="rules-info__text">Научный центр. При постройке повышает уровень игрока до 2, позволяя строить сейсмобомбы и ионную пушку. Строится рядом с командным центром.</p>
+						</div>
+
+						<div class="br"></div>
+
+						<div class="rules-info__bldg-cont">
+							<div class="b_1_3 rules-info__bldg-model rules-info__bldg-model--1x1" data-tilt>
+								<div class="foundation_1x1">
+									<div class="f_0_0"></div>
+								</div>
+			
+								<div class="lvl_1"></div>
+								<div class="lvl_2"></div>
+								<div class="lvl_3"></div>
+							</div>
+						</div>
+
+						<div class="rules-info__bldg-rules">
+							<p class="rules-info__text">Сейсмобомба. Атакующее здание уровня 2. При атаке уничтожает пустую клетку поля противника и уничтожается сама. При атаке фундамента уничтожает все клетки под ним. Строится рядом с научным центром и сейсмобомбой.</p>
+						</div>
+
+						<div class="br"></div>
+
+						<div class="rules-info__bldg-cont">
+							<div class="b_1_4 rules-info__bldg-model rules-info__bldg-model--3x3" data-tilt>
+								<div class="foundation_3x3">
+									<div class="f_0_0"></div>
+									<div class="f_1_0"></div>
+									<div class="f_2_0"></div>
+									<div class="f_0_1"></div>
+									<div class="f_1_1"></div>
+									<div class="f_2_1"></div>
+									<div class="f_0_2"></div>
+									<div class="f_1_2"></div>
+									<div class="f_2_2"></div>
+								</div>
+			
+								<div class="lvl_1"></div>
+								<div class="lvl_2"></div>
+								<div class="lvl_3"></div>
+								<div class="lvl_4"></div>
+							</div>
+						</div>
+
+						<div class="rules-info__bldg-rules">
+							<p class="rules-info__text">Ионная пушка. Атакующее здание уровня 2. При атаке уничтожает клетки со зданиями противника размером 2х2 и уничтожает 1 элемент самой пушки. Строится рядом с научным центром.</p>
+						</div>
+
+					</div>
+				`
 				};
 
 				rulesPages.race2 = {
 					title: 'Правила игры за Династию',
-					HTML: `DINASTION RULES`
+					HTML: `
+				<h1 class="rules-info__title">Правила игры за Династию</h1>
+
+				<div class="rules-info__bldg-info">
+					<div class="rules-info__bldg-cont">
+						<div class="b_2_0 rules-info__bldg-model rules-info__bldg-model--2x1" data-tilt>
+							<div class="foundation_2x1">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+							</div>
+			
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Пилон. Здания Династии можно строить лишь рядом с пилоном. Строится на любых клетках поля.</p>
+					</div>
+					
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_2_1 rules-info__bldg-model rules-info__bldg-model--2x3" data-tilt>
+							<div class="foundation_2x3">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+								<div class="f_0_2"></div>
+								<div class="f_1_2"></div>
+							</div>
+				
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Нексус - главное здание Династии. Каждый Нексус увеличивает максимально доступное количество действий на 2. Строится рядом с пилоном.</p>
+					</div>
+
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_2_2 rules-info__bldg-model rules-info__bldg-model--1x1" data-tilt>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
+			
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Фотонная пушка. Атакующее здание. При атаке уничтожает элемент здания противника и уничтожается сама. Строится рядом с пилоном.</p>
+					</div>
+
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_2_3 rules-info__bldg-model rules-info__bldg-model--2x2" data-tilt>
+							<div class="foundation_2x2">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Ассимилятор. Повышает уровень игрока до 2. Атакующее здание. При атаке уничтожает пустую клетку поля противника, делая ее недоступной для строительства. При атаке фундамента уничтожает все клетки под ним. Строится рядом с пилоном.</p>
+					</div>
+
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_2_4 rules-info__bldg-model rules-info__bldg-model--2x2" data-tilt>
+							<div class="foundation_2x2">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Анигилятор. Атакующее здание уровня 2. При атаке уничтожает клетки со зданиями противника размером 2х2 и уничтожает 1 элемент самого Анигилятора. Строится рядом с пилоном.</p>
+					</div>
+
+				</div>
+				`
 				};
 
 				rulesPages.race3 = {
 					title: 'Правила игры за Анклав',
-					HTML: `ANCLAV RULES`
+					HTML: `
+				<h1 class="rules-info__title">Правила игры за Анклав</h1>
+
+				<div class="rules-info__bldg-info">
+					<div class="rules-info__bldg-cont">
+						<div class="b_3_0 rules-info__bldg-model rules-info__bldg-model--2x2" data-tilt>
+							<div class="foundation_2x2">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+							</div>
+			
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Цитадель. Основное здание Анклава. Увеличивает максимально доступное число действий на 1. Строится рядом с любыми зданиями Анклава.</p>
+					</div>
+					
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_3_1 rules-info__bldg-model rules-info__bldg-model--2x1" data-tilt>
+							<div class="foundation_2x1">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Тотем. Атакующее здание. При атаке уничтожает элемент здания противника, уничтожая при этом один элемент тотема. Строится рядом с любыми зданиями Анклава.</p>
+					</div>
+
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_3_2 rules-info__bldg-model rules-info__bldg-model--2x3" data-tilt>
+							<div class="foundation_2x3">
+								<div class="f_0_0"></div>
+								<div class="f_1_0"></div>
+								<div class="f_0_1"></div>
+								<div class="f_1_1"></div>
+								<div class="f_0_2"></div>
+								<div class="f_1_2"></div>
+							</div>
+					
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+							<div class="lvl_4"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Вапр-портал. Повышает уровень игрока до 2. Позволяет строить Маяк пустоты и Маяк гнева. Строится рядом с любыми зданиями Анклава.</p>
+					</div>
+
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_3_3 rules-info__bldg-model rules-info__bldg-model--1x1" data-tilt>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
+
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Маяк пустоты. Атакующее здание 2 уровня. При атаке уничтожает пустую клетку поля противника, при этом уничтожается сам. При атаке фундамента уничтожает все клетки под ним. Строится на любой свободной клетке поля.</p>
+					</div>
+
+					<div class="br"></div>
+
+					<div class="rules-info__bldg-cont">
+						<div class="b_3_4 rules-info__bldg-model rules-info__bldg-model--1x1" data-tilt>
+							<div class="foundation_1x1">
+								<div class="f_0_0"></div>
+							</div>
+
+							<div class="lvl_1"></div>
+							<div class="lvl_2"></div>
+							<div class="lvl_3"></div>
+						</div>
+					</div>
+
+					<div class="rules-info__bldg-rules">
+						<p class="rules-info__text">Маяк гнева. Атакующее здание 2 уровня. При атаке уничтожает элемент здания противника, при этом уничтожается сам. Строится на любой свободной клетке поля.</p>
+					</div>
+
+				</div>
+				`
 				};
 
 				$rulesInfo.innerHTML = rulesPages[page].HTML;

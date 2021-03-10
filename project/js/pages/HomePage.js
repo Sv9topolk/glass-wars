@@ -1,12 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('firebase')) :
-	typeof define === 'function' && define.amd ? define('homePage', ['firebase'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.homePage = factory(global.firebase));
-}(this, (function (firebase) { 'use strict';
-
-	function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-	var firebase__default = /*#__PURE__*/_interopDefaultLegacy(firebase);
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define('homePage', factory) :
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.homePage = factory());
+}(this, (function () { 'use strict';
 
 	const HomePage = {
 		id: 'home',
@@ -217,12 +213,23 @@
 			const $content = document.getElementById('content');
 
 			// Слушатель на кнопку включения музыки
+			let bgMusic = new Howl({
+				src: ['../media/bg-music.mp3'],
+				autoplay: true,
+				loop: true,
+			});
+
 			const $musicBtn = $content.querySelector('.music');
 			const $musicIconOn = $musicBtn.querySelector('.music__icon--on');
 			const $musicIconOff = $musicBtn.querySelector('.music__icon--off');
 			$musicBtn.addEventListener('click', () => {
 				$musicIconOn.classList.toggle('display-none');
 				$musicIconOff.classList.toggle('display-none');
+				if (bgMusic.playing()) {
+					bgMusic.stop();
+				} else {
+					bgMusic.play();
+				}
 			});
 
 			// Слушатель на кнопку Новая игра - вызов окна авторизации
@@ -238,13 +245,13 @@
 
 			//! Получение имени игроков по авторизации или как гостя и выбор расы
 			let playerLeft = {
-				name: '',
+				name: 'Игрок 1',
 				race: 'race1',
 				hasAccount: false,
 			};
 
 			let playerRight = {
-				name: '',
+				name: 'Игрок 2',
 				race: 'race1',
 				hasAccount: false,
 			};
@@ -338,9 +345,6 @@
 
 			// --------------------- Общий функционал ---------------------
 
-
-
-
 			function enterAccount(event) {
 				console.log('Войти в аккаунт');
 
@@ -357,10 +361,9 @@
 					userPass = $inpPassPR.value;
 				}
 
-				firebase__default['default'].auth().signInWithEmailAndPassword(userEmail, userPass)
+				firebase.auth().signInWithEmailAndPassword(userEmail, userPass)
 					.then(response => console.log(response))
 					.catch(error => console.log(error));
-
 			}
 
 			function createAccount(event) {
@@ -380,13 +383,11 @@
 					newUserPass = $inpPassPR.value;
 				}
 
-				firebase__default['default'].auth().createUserWithEmailAndPassword(newUserEmail, newUserPass)
+				firebase.auth().createUserWithEmailAndPassword(newUserEmail, newUserPass)
 					.catch(error => console.log(error));
 			}
 
 			function enterAsGuest(event) {
-				console.log('Войти как гость');
-
 				const side = event.target.id.slice(-1).toLowerCase();
 
 				if (side === 'l') {
