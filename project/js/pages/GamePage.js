@@ -2712,10 +2712,10 @@
 			}
 
 			const sound = {
-				attack: new Howl({ src: ['/media/attack.mp3'] }),
-				build: new Howl({ src: ['/media/build.mp3'] }),
-				turn: new Howl({ src: ['/media/turn.mp3'] }),
-				win: new Howl({ src: ['/media/applause.mp3'] }),
+				attack: new Howl({ src: ['media/attack.mp3'] }),
+				build: new Howl({ src: ['media/build.mp3'] }),
+				turn: new Howl({ src: ['media/turn.mp3'] }),
+				win: new Howl({ src: ['media/applause.mp3'] }),
 			};
 
 		}
