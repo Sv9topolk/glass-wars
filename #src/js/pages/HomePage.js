@@ -208,7 +208,7 @@ const HomePage = {
 
 		// Слушатель на кнопку включения музыки
 		let bgMusic = new Howl({
-			src: ['/project/media/bg-music.mp3'],
+			src: ['/media/bg-music.mp3'],
 			autoplay: true,
 			loop: true,
 		});
