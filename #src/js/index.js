@@ -37,8 +37,6 @@ import ContentContainer from './components/ContentContainer.js';
 
 
 
-
-
 // Компоненты приложения - хидер и контейнер основного содержимого
 const components = [
 	Header,
@@ -146,5 +144,25 @@ const GlassWarsSPA = (function () {
 GlassWarsSPA('spa', routes, components);
 
 
+// Фоновая музыка
+(function bgMusic() {
+	const bgMusic = new Howl({
+		src: ['media/bg-music.mp3'],
+		autoplay: true,
+		loop: true,
+		volume: 0.5,
+	});
 
-
+	const $musicBtn = document.querySelector('.music');
+	const $musicIconOn = $musicBtn.querySelector('.music__icon--on');
+	const $musicIconOff = $musicBtn.querySelector('.music__icon--off');
+	$musicBtn.addEventListener('click', () => {
+		$musicIconOn.classList.toggle('display-none');
+		$musicIconOff.classList.toggle('display-none');
+		if (bgMusic.playing()) {
+			bgMusic.pause();
+		} else {
+			bgMusic.play();
+		}
+	});
+})();

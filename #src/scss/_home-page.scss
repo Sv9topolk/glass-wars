@@ -10,6 +10,8 @@
 	user-select: none;
 
 	&__description {
+		position: relative;
+		z-index: 100;
 		margin: 0.5rem 0;
 		padding: 0.5rem;
 		font-size: 1.5rem;
@@ -102,30 +104,6 @@
 	}
 }
 
-.music {
-	position: absolute;
-	top: 1rem;
-	right: 1rem;
-	display: block;
-	width: 2rem;
-	height: 2rem;
-	padding: 0;
-
-	background-color: transparent;
-	border: none;
-	opacity: 0.5;
-	transition: opacity 0.2s, transform 0.2s;
-
-	&:hover {
-		opacity: 1;
-	}
-	&:focus {
-		outline: none;
-	}
-	&:active {
-		transform: scale(0.9);
-	}
-}
 
 // Блок аутентификации игроков
 .auth {

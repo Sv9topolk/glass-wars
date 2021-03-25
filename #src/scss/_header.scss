@@ -56,6 +56,36 @@
 	}
 }
 
+.music {
+	position: absolute;
+	top: 1rem;
+	right: 8rem;
+	display: block;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+
+	background-color: transparent;
+	border: none;
+	opacity: 0.5;
+	transition: opacity 0.2s, transform 0.2s;
+
+	&:hover {
+		opacity: 1;
+	}
+	&:focus {
+		outline: none;
+	}
+	&:active {
+		transform: scale(0.9);
+	}
+}
+.hidden .music {
+	visibility: visible;
+	right: 1rem;
+}
+
+
 
 // ! Hovers
 .nav__link:hover {
